@@ -7,12 +7,19 @@ async function fetchProducts() {
     try {
         const response = await fetch('/api/products'); 
         const products = await response.json();
+        
+        console.log("Response from server:", products); 
+        if (!Array.isArray(products)) {
+            console.error("Server returned NOT an array. Check your controller!");
+            return;
+        }
+
+
         renderProducts(products);
     } catch (error) {
         console.error('Error fetching products:', error);
     }
 }
-
 function renderProducts(products) {
     const container = document.getElementById('product-container');
     container.innerHTML = ''; 

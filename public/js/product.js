@@ -38,20 +38,23 @@ async function addToCart(productId) {
     const sku = document.getElementById('variantSelect').value;
     const qty = parseInt(document.getElementById('quantityInput').value);
 
-    if (!token) {
-        alert('Please login first');
-        window.location.href = '/auth.html';
-        return;
-    }
+    const priceText = document.getElementById('productPrice').innerText;
+    const priceSnapshot = parseFloat(priceText.replace(/[^0-9.]/g, '')); 
 
-    const res = await fetch('/api/orders/cart/add', {
+    const res = await fetch('/api/cart/add', {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ productId, sku, qty })
+        body: JSON.stringify({ productId, sku, qty, priceSnapshot }) 
     });
+
+    if (!token) {
+        alert('Please login first');
+        window.location.href = '/auth.html';
+        return;
+    }
 
     if (res.ok) {
         alert('Product added to cart!');

@@ -5,7 +5,6 @@ const { protect, adminOnly } = require('../middleware/auth.middleware');
 
 router.get('/', productController.getAllProducts);
 router.get('/:id', productController.getProductById);
-
 router.post('/', protect, adminOnly, productController.createProduct);
 router.delete('/:id', protect, adminOnly, productController.deleteProduct);
 

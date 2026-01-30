@@ -1,4 +1,3 @@
-
 document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('loginEmail').value;
@@ -14,19 +13,20 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
         const data = await res.json();
 
         if (res.ok) {
-           
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
             
             alert('Login successful!');
-            window.location.href = '/'; 
+            window.location.href = '/index.html'; 
         } else {
             alert(data.message || 'Login failed');
         }
     } catch (err) {
         console.error('Auth error:', err);
+        alert('Server connection error');
     }
 });
+
 
 document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -41,13 +41,16 @@ document.getElementById('registerForm')?.addEventListener('submit', async (e) =>
             body: JSON.stringify({ fullName, email, password })
         });
 
+        const data = await res.json(); 
+
         if (res.ok) {
             alert('Registration successful! Please login.');
-            location.reload();
-            const data = await res.json();
+            location.reload(); 
+        } else {
             alert(data.message || 'Registration failed');
         }
     } catch (err) {
         console.error('Reg error:', err);
+        alert('Server connection error');
     }
 });

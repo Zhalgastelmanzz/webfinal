@@ -106,7 +106,7 @@ Utilized embedded documents for variants to minimize the number of database look
 1) Clone the repository.
 2) Install dependencies: npm install.
 3) Create a .env file with:
-4) MONGO_URI: MongoDB connection string.
-5) JWT_SECRET: A secure key for token signing.
-6) PORT: 5000.
-7) Start the server: npm start or npm run dev.
+ MONGO_URI: MongoDB connection string.
+ JWT_SECRET: A secure key for token signing.
+ PORT: 5000.
+4) Start the server: npm start or npm run dev.

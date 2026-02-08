@@ -31,6 +31,13 @@ Features a product catalog, shopping cart, user authentication, admin panel, and
 - **bcryptjs** – password hashing
 - **jsonwebtoken** – JWT tokens
 
+## Deployment
+
+Live demo: https://crown-game-store.onrender.com/
+Deployed on Render (free tier).  
+Database: MongoDB Atlas  
+All environment variables are set in Render dashboard.
+
 ## Installation
 
 1. **Clone the repository:**

@@ -1,112 +1,140 @@
-# 🛍️ Online Store API & Admin Dashboard
+🛍️ Crown Game Store — Онлайн-магазин игр
 
-A full-stack E-commerce solution built with Node.js, Express, and MongoDB. The project features a robust product management system, real-time sales analytics via MongoDB Aggregation Pipelines, and a secure Admin Panel.
-
----
-
-## 🏗️ System Architecture
-The application follows a modular **Model-View-Controller (MVC)** pattern:
-- **Frontend**: Vanilla JavaScript, Bootstrap 5, and Static HTML.
-- **Backend**: Node.js & Express.js.
-- **Database**: MongoDB Atlas (NoSQL) with Mongoose ODM.
-- **Authentication**: Stateless JWT (JSON Web Tokens) with role-based access control (RBAC).
+Полноценный full-stack интернет-магазин цифровых игр на Node.js, Express и MongoDB.  
+Проект включает каталог продуктов, корзину, авторизацию, админ-панель и оформление заказа с перенаправлением в WhatsApp для подтверждения и оплаты.
 
 ---
 
-## 📊 Database Schema Description
-The **online_shop** database consists of the following core collections:
+## 🏗️ Основные возможности
 
-1. **Products**: Highly detailed documents including:
-   - `variants`: Array of objects (size, color, stockQty).
-   - `images`: Array of URLs.
-   - `categoryId`: Reference to the Categories collection.
-2. **Orders**: Captures transaction snapshots, including `items` (productId, qty, lineTotal) and `status`.
-3. **Users**: Stores credentials and roles (`user` vs `admin`).
-4. **Categories**: Simple documents for catalog organization.
+- Каталог игр с фильтрацией по категориям (Action/Adventure, RPG, Horror, Racing, Shooter)
+- Детальная страница товара с изображениями, описанием, вариантами платформ и скидками
+- Корзина с сохранением в базу данных
+- Авторизация и регистрация пользователей (JWT)
+- Админ-панель со статистикой продаж и управлением заказами
+- Оформление заказа → автоматическое создание ордера в базе → перенаправление в WhatsApp чат поддержки
+- Полностью адаптивный дизайн на Bootstrap 5 + Vanilla JS
 
 ---
 
-## 🔍 Advanced MongoDB Queries
-### Sales Analytics (Aggregation Pipeline)
-To generate the Admin Dashboard stats, we use a multi-stage pipeline to calculate revenue per category:
+## 📊 Технологии
 
-```javascript
-[
-  { "$unwind": "$items" },
-  { "$lookup": { 
-      "from": "products", 
-      "localField": "items.productId", 
-      "foreignField": "_id", 
-      "as": "productDetails" 
-  }},
-  { "$unwind": "$productDetails" },
-  { "$group": { 
-      "_id": "$productDetails.categoryId", 
-      "totalRevenue": { "$sum": "$items.lineTotal" },
-      "totalUnitsSold": { "$sum": "$items.qty" }
-  }},
-  { "$sort": { "totalRevenue": -1 } }
-]
-```
-## 🚀 API Documentation
-### 🔐 Authentication (/api/auth)
-POST /register: Registers a new user account and saves profile information to the database.
+**Backend**
+- Node.js + Express.js
+- MongoDB (Atlas) + Mongoose
+- JWT для аутентификации
+- RBAC (роли: user / admin)
 
-POST /login: Authenticates user credentials and returns a JWT for secure session access.
+**Frontend**
+- Vanilla JavaScript
+- Bootstrap 5
+- HTML + CSS
 
-GET /me: Retrieves the profile data for the currently authenticated user session.
+**Инструменты**
+- dotenv — переменные окружения
+- bcryptjs — хэширование паролей
+- jsonwebtoken — JWT токены
 
-### 📦 Products (/api/products)
-GET /: Fetches the complete list of available products for the store catalog.
+---
 
-GET /:id: Provides comprehensive details for a single specific product by its unique ID.
+## 📂 Структура проекта
+webfinal/
+├── public/                  # Статические файлы (HTML, CSS, JS)
+│   ├── js/
+│   │   ├── main.js        # Главная страница, каталог, категории
+│   │   ├── product.js     # Детальная страница товара + добавление в корзину
+│   │   └── cart.js        # Страница корзины + Place Order → WhatsApp
+│   ├── product.html
+│   ├── cart.html
+│   └── ... (остальные страницы)
+├── src/
+│   ├── models/            # Mongoose схемы
+│   │   ├── User.js
+│   │   ├── Product.js
+│   │   ├── Cart.js
+│   │   ├── Order.js
+│   │   └── Category.js
+│   ├── controllers/       # Логика обработки запросов
+│   ├── routes/            # Роуты API
+│   ├── middleware/
+│   │   └── auth.middleware.js
+│   └── server.js          # Точка входа сервера
+├── .env.example
+├── package.json
+└── README.md
+text---
 
-POST /: Grants administrators the ability to add new product entries to the database.
+## 🚀 Быстрый старт
 
-DELETE /:id: Allows administrators to permanently remove a specific product from the catalog.
+1. **Клонируй репозиторий**
 
-### 🛒 Shopping Cart (/api/cart)
-GET /: Loads all items currently stored in the authenticated user's personal shopping cart.
+```bash
+git clone https://github.com/Zhalgastelmanzz/webfinal.git
+cd webfinal
 
-POST /add: Adds a selected product and its specified quantity to the user's active cart.
+Установи зависимости
 
-DELETE /item/:itemId: Removes a specific item entry from the user's shopping cart.
+Bashnpm install
 
-### 🧾 Orders (/api/orders)
-POST /orders: Processes the checkout by converting cart items into a finalized order with shipping details.
+Создай файл .env в корне проекта и заполни:
 
-GET /my-orders: Displays a complete history of all past and current orders placed by the user.
+envPORT=5000
+MONGO_URI=mongodb+srv://<user>:<password>@cluster0.mongodb.net/crown_gamestore?retryWrites=true&w=majority
+JWT_SECRET=твой_очень_секретный_ключ_минимум_32_символа
 
-GET /cart: Provides a utility endpoint to verify cart state during the order placement sequence.
+Запусти сервер
 
-### 🛠️ Admin Management (/api/admin)
-GET /stats: Generates a detailed sales analytics report with revenue grouped by category.
+Bashnpm run dev    # или npm start
+Сервер запустится на http://localhost:5000
 
-GET /orders: Gives administrators a centralized view of every customer order across the platform.
+Открой сайт
 
-PATCH /orders/:id/status: Enables administrators to update the fulfillment status of any specific order.
 
-### 📂 Categories (/api/categories)
-GET /: Returns a list of all product categories defined in the system.
+Главная: http://localhost:5000/
+Деталка товара: http://localhost:5000/product.html?id=...
+Корзина: http://localhost:5000/cart.html (нужно залогиниться)
 
-POST /: Allows for the creation of new product categories within the database.
 
-## ⚡ Indexing & Optimization Strategy
+🔐 Авторизация
 
-### Compound Indexing: 
-Implemented on { categoryId: 1, price: 1 } to optimize simultaneous filtering and price sorting in the product catalog.
+Регистрация: POST /api/auth/register
+Логин: POST /api/auth/login → сохраняет токен в localStorage
+Защищённые роуты используют Bearer Token в заголовке Authorization
 
-### Relational Integrity: 
-Used ObjectId references for categoryId to maintain clean data relationships.
+Админ-панель доступна только для пользователей с ролью admin.
 
-### Schema Design: 
-Utilized embedded documents for variants to minimize the number of database lookups when viewing product details.
+🛒 Оформление заказа (Place Order)
 
-## 🛠️ Setup Instructions
-1) Clone the repository.
-2) Install dependencies: npm install.
-3) Create a .env file with:
- MONGO_URI: MongoDB connection string.
- JWT_SECRET: A secure key for token signing.
- PORT: 5000.
-4) Start the server: npm start or npm run dev.
+Добавь товары в корзину (на детальной странице)
+Перейди на /cart.html
+Кликни Place Order
+Создаётся запись в коллекции orders
+Корзина автоматически очищается
+Браузер перенаправляет в WhatsApp чат поддержки с текстом:
+
+textМой заказ ID: 123abc456def. Подтвердите, пожалуйста.
+(номер WhatsApp указан в cart.js — замени на свой)
+
+⚡ Админ-панель (в разработке)
+
+Статистика продаж по категориям (MongoDB Aggregation)
+Просмотр и изменение статусов заказов
+Управление товарами и категориями
+
+
+🛠️ Полезные команды
+Bashnpm run dev     # запуск с nodemon (автоперезапуск при изменениях)
+npm start       # обычный запуск
+
+⚠️ Важно
+
+Все игры — цифровые, поэтому проверка стока и адрес доставки отключены
+Оплата и отправка ключей происходит через чат в WhatsApp
+Для теста используй тестовые аккаунты (admin / user)
+
+
+📞 Контакты и поддержка
+Если хочешь добавить новые функции (оплата через Kaspi, страница профиля, отзывы, поиск по товарам) — пиши в WhatsApp или создавай issue в репозитории.
+Готов помочь с доработкой! 🚀
+Авторы: Zhalgas Telman,Samandar Babakhanov,Adil Yerlik
+Дата: 2026

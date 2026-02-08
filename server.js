@@ -31,9 +31,9 @@ app.use(`/api/products`, productRoutes);
 app.use(`/api/orders`, orderRoutes);
 app.use(`/api/admin`, adminRoutes);
 
-mongoose.connect(mongoURI, { dbName: "online_shop" })
+mongoose.connect(mongoURI, { dbName: "crown_gamestore" })
   .then(() => {
-    console.log(`Connected to MongoDB: online_shop`);
+    console.log(`Connected to MongoDB: crown_gamestore`);
     app.listen(port, () => {
       console.log(`Server is running on http://localhost:${port}`)
     })
@@ -41,3 +41,4 @@ mongoose.connect(mongoURI, { dbName: "online_shop" })
   .catch((err) => {
     console.error(`Failed to connect to MongoDB`, err);
   });
+  

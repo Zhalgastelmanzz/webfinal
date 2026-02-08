@@ -40,28 +40,29 @@ exports.getAllProducts = async (req, res) => {
 };
 
 exports.getProductById = async (req, res) => {
-    const id = req.params.id.trim(); // убираем пробелы, если есть
+  try {
+    let id = req.params.id || req.query.id;
 
-    console.log('=== Запрос продукта ===');
-    console.log('ID из URL:', id);
+    console.log('[DETAIL] Запрошен ID:', id);
 
-    try {
-        // Ищем по строке _id (без ObjectId)
-        const product = await Product.findOne({ _id: id })
-            .populate('categoryId', 'name slug description');
+    // Пытаемся найти как ObjectId
+    let product = await Product.findById(id).catch(() => null);
 
-        if (!product) {
-            console.log('Продукт НЕ НАЙДЕН по строке _id:', id);
-            console.log('Всего продуктов:', await Product.countDocuments());
-            return res.status(404).json({ message: 'Product not found' });
-        }
-
-        console.log('Продукт НАЙДЕН:', product.name);
-        res.json(product);
-    } catch (error) {
-        console.error('Ошибка:', error);
-        res.status(500).json({ message: error.message });
+    // Если не нашлось — пробуем как простую строку
+    if (!product) {
+      product = await Product.findOne({ _id: id });
+      console.log('[DETAIL] Поиск по строке _id:', product ? 'НАЙДЕН' : 'НЕ НАЙДЕН');
     }
+
+    if (!product) {
+      return res.status(404).json({ message: 'Товар не найден' });
+    }
+
+    res.json(product);
+  } catch (error) {
+    console.error('[DETAIL ERROR]', error);
+    res.status(500).json({ message: 'Ошибка сервера' });
+  }
 };
 exports.createProduct = async (req, res) => {
     try {

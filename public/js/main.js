@@ -18,11 +18,16 @@ async function loadCategories() {
         const categories = await res.json();
         const container = document.getElementById('category-list');
 
-        // Добавляем "All Products" только один раз — вручную
+        if (!container) {
+            console.error('Элемент #category-list не найден');
+            return;
+        }
+
+        // "All Products"
         const allLink = document.createElement('a');
         allLink.href = "#";
         allLink.className = "list-group-item list-group-item-action active";
-        allLink.innerText = "All Products";
+        allLink.textContent = "All Products";
         allLink.onclick = (e) => {
             e.preventDefault();
             document.querySelectorAll('#category-list a').forEach(el => el.classList.remove('active'));
@@ -31,17 +36,14 @@ async function loadCategories() {
         };
         container.appendChild(allLink);
 
-        // Добавляем категории из базы, пропуская "All Products" (если вдруг она там есть)
         categories.forEach(cat => {
-            if (cat.name.trim().toLowerCase() === "all products") {
-                return; // пропускаем дубликат
-            }
+            if (cat.name?.trim().toLowerCase() === "all products") return;
 
             const link = document.createElement('a');
             link.href = "#";
             link.className = "list-group-item list-group-item-action";
-            link.innerText = cat.name;
-            link.dataset.slug = cat.slug || cat.name.toLowerCase().replace(/ /g, '-');
+            link.textContent = cat.name || 'Без названия';
+            link.dataset.slug = cat.slug || cat.name?.toLowerCase().replace(/ /g, '-') || '';
 
             link.onclick = (e) => {
                 e.preventDefault();
@@ -53,38 +55,51 @@ async function loadCategories() {
         });
     } catch (err) {
         console.error("Ошибка загрузки категорий:", err);
-        if (document.getElementById('category-list')) {
-            document.getElementById('category-list').innerHTML += '<p class="text-danger">Не удалось загрузить категории</p>';
-        }
     }
 }
 
 async function fetchProducts(category = null) {
     const container = document.getElementById('product-container');
+    if (!container) {
+        console.error('Элемент #product-container не найден');
+        return;
+    }
+
     container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
 
     let url = '/api/products';
-    if (category) url += `?category=${category}`;
+    if (category) {
+        url += `?category=${encodeURIComponent(category)}`;
+    }
 
-    fetch(url)
-      .then(res => res.json())
-      .then(products => {
-          console.log('Получено продуктов:', products.length); // добавь для отладки
-          container.innerHTML = ''; // очищаем лоадер
-          renderProducts(products);
-      })
-      .catch(err => {
-          console.error("Ошибка:", err);
-          container.innerHTML = '<p class="text-danger text-center">Ошибка загрузки продуктов. Попробуйте обновить страницу.</p>';
-      })
-      .finally(() => {
-          // всегда скрываем лоадер, даже при ошибке
-          const loader = container.querySelector('.spinner-border');
-          if (loader) loader.remove();
-      });
+    try {
+        const res = await fetch(url);
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
+        }
+
+        const products = await res.json();
+
+        console.log('Получено продуктов:', products?.length || 0);
+        console.log('Пример первого продукта:', products[0] ? {
+            name: products[0].name,
+            _id: products[0]._id,
+            _id_type: typeof products[0]._id,
+            _id_length: products[0]._id?.length
+        } : 'Нет продуктов');
+
+        container.innerHTML = '';
+        renderProducts(products);
+    } catch (err) {
+        console.error("Ошибка загрузки продуктов:", err);
+        container.innerHTML = '<p class="text-danger text-center py-5">Не удалось загрузить товары. Проверь консоль (F12).</p>';
+    }
 }
+
 function renderProducts(products) {
     const container = document.getElementById('product-container');
+    if (!container) return;
+
     container.innerHTML = '';
 
     if (!Array.isArray(products) || products.length === 0) {
@@ -98,15 +113,24 @@ function renderProducts(products) {
     }
 
     products.forEach(p => {
-        const imgSrc = p.images && p.images.length > 0 ? p.images[0] : 'https://via.placeholder.com/300x400?text=Нет+фото';
+        // Отладка каждого продукта
+        console.log(`Продукт: ${p.name || 'Без имени'} | _id: ${p._id} | тип: ${typeof p._id} | длина: ${p._id?.length || 'нет'}`);
+
+        // Защита от битого _id
+        if (!p._id || typeof p._id !== 'string' || p._id.length !== 24) {
+            console.warn('Пропущен продукт с некорректным _id:', p.name, p._id);
+            return;
+        }
+
+        const imgSrc = p.images?.[0] || 'https://via.placeholder.com/300x400?text=Нет+фото';
         const name = p.name || 'Без названия';
         const brand = p.brand || '';
-        const price = p.price ? p.price.toLocaleString('ru-RU') + ' ' + (p.currency || 'KZT') : 'Цена не указана';
+        const price = p.price 
+            ? `${Number(p.price).toLocaleString('ru-RU')} ${p.currency || 'KZT'}`
+            : 'Цена не указана';
 
-        const catName = p.categoryId?.name || 'Игры';
+        const productUrl = `/product.html?id=${p._id}`;
 
-        const productId = p._id.toString ? p._id.toString() : p._id; 
-const productUrl = `/product.html?id=${productId}&catName=${encodeURIComponent(catName || 'Игры')}`;
         const card = `
             <div class="col-md-4 mb-4">
                 <div class="card h-100 shadow-sm border-0">

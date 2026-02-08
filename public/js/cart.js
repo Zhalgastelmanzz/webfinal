@@ -40,7 +40,7 @@ function renderCart(cart) {
                 </div>
                 <div class="col-7">
                     <h6 class="fw-bold mb-1">${item.productId.name}</h6>
-                    <div class="text-muted small"> Size / Color: ${item.sku}</div>
+                    <div class="text-muted small"> Platform: ${item.sku}</div>
                     <div class="mt-1">Qty: ${item.qty} x <strong>${item.priceSnapshot} KZT</strong></div>
                 </div>
                 <div class="col-3 text-end">
@@ -57,7 +57,7 @@ function renderCart(cart) {
 
     currentTotal = total;
     document.getElementById('total').innerText = `${total} KZT`;
-    const checkoutBtn = document.getElementById('checkoutBtn');
+    const checkoutBtn = document.getElementById('placeOrderBtn');
     if(checkoutBtn) {
         checkoutBtn.onclick = placeOrder;
     }
@@ -67,9 +67,6 @@ async function placeOrder() {
     console.log("Кнопка нажата!");
 
     const token = localStorage.getItem('token');
-    const address = document.getElementById('addressInput').value;
-
-    if (!address) return alert('Please enter a shipping address.');
     if (!token) return alert('You must be logged in to place an order.');
 
     const orderData = {
@@ -79,8 +76,7 @@ async function placeOrder() {
             qty: item.qty,
             lineTotal: (item.priceSnapshot || 0) * item.qty
         })),
-        totalAmount: currentTotal,
-        shippingAddress: { city: "Astana", street: address, zip: "010000" }
+        totalAmount: currentTotal
     };
 
     try {
@@ -94,8 +90,12 @@ async function placeOrder() {
         });
 
         if (res.ok) {
+            const data = await res.json();
             alert('Order placed successfully!');
-            window.location.href = '/profile.html';
+
+            const whatsAppNumber = '+77752467758';  
+            const message = `My order ID: ${data.orderId}. Please confirm.`;
+            window.location.href = `https://wa.me/${whatsAppNumber}?text=${encodeURIComponent(message)}`;
         } else {
             const error = await res.json();
             alert(`Failed to place order: ${error.message}`);

@@ -30,7 +30,7 @@ const productSchema = new Schema({
 }, { 
   timestamps: true,
   strict: false,
-  strictQuery: false  // ← это отключает строгий фильтр
+  strictQuery: false  
 });
 
 productSchema.index({ categoryId: 1, price: 1 });

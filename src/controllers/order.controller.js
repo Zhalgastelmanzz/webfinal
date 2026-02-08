@@ -1,37 +1,47 @@
 const Order = require('../models/order');
-const Product = require('../models/product');
 const Cart = require('../models/cart');
 
 exports.createOrder = async (req, res) => {
     try {
-        const { shippingAddress, items, totalAmount } = req.body;
         const userId = req.user.id;
 
-        for (const item of items) {
-            const product = await Product.findById(item.productId);
-            const variant = product.variants.find(v => v.sku === item.sku);
-            
-            if (!variant || variant.stockQty < item.qty) {
-                return res.status(400).json({ message: `No stock for ${item.sku}` });
-            }
-
-            await Product.updateOne(
-                { _id: item.productId, "variants.sku": item.sku },
-                { $inc: { "variants.$.stockQty": -item.qty } }
-            );
+        const cart = await Cart.findOne({ userId: userId });
+        if (!cart || cart.items.length === 0) {
+            return res.status(400).json({ message: 'Корзина пуста' });
         }
 
+    
+        const totalAmount = cart.items.reduce((sum, item) => sum + item.priceSnapshot * item.qty, 0);
+
         const newOrder = new Order({
-            userId, shippingAddress, items, totalAmount,
-            status: 'paid', paidAt: new Date()
+            userId: userId,
+            items: cart.items.map(item => ({
+                productId: item.productId,
+                sku: item.sku,
+                productNameSnapshot: item.productNameSnapshot || '',
+                unitPriceSnapshot: item.priceSnapshot,
+                qty: item.qty,
+                lineTotal: item.priceSnapshot * item.qty
+            })),
+            totalAmount: totalAmount,
+            status: 'pending'  
         });
 
         await newOrder.save();
-        await Cart.findOneAndUpdate({ userId: req.user.id }, { $set: { items: [] } });
 
-        res.status(201).json(newOrder);
+        
+        cart.items = [];
+        await cart.save();
+
+        res.status(201).json({ 
+            message: 'Заказ создан', 
+            orderId: newOrder._id,
+            total: totalAmount 
+        });
+
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Ошибка создания заказа:', error);
+        res.status(500).json({ message: 'Ошибка создания заказа' });
     }
 };
 

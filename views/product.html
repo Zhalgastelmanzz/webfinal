@@ -3,131 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Details | Crown Game Store</title>
+    <title>Product Details | Online Store</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .product-img { max-height: 500px; object-fit: contain; }
-    </style>
 </head>
 <body class="bg-light">
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-5">
         <div class="container">
             <a class="navbar-brand" href="/">Crown Game Store</a>
-            <a href="/" class="btn btn-outline-light btn-sm ms-auto">Back to Catalog</a>
+            <a href="/" class="btn btn-outline-light btn-sm">Catalog</a>
         </div>
     </nav>
 
-    <div class="container my-5">
-        <div id="productDetail" class="row bg-white p-4 shadow rounded">
-            <div class="col-12 text-center py-5">
-                <div class="spinner-border text-primary" style="width: 4rem; height: 4rem;" role="status">
-                    <span class="visually-hidden">Loading...</span>
+    <div class="container">
+        <div class="row bg-white p-4 shadow-sm rounded">
+            <div class="col-md-6 text-center">
+                <img id="productImg" src="https://via.placeholder.com/500" class="img-fluid rounded" alt="Product Image">
+            </div>
+
+            <div class="col-md-6">
+                <h1 id="productName" class="display-5 fw-bold">Loading...</h1>
+                <p id="productBrand" class="text-muted fs-5 mb-3"></p>
+                <h3 id="productPrice" class="text-primary mb-4"></h3>
+                <p id="productDesc" class="lead"></p>
+
+                <hr>
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Select Platform</label>
+                    <select class="form-select" id="variantSelect">
+                    </select>
                 </div>
-                <p class="mt-3">Loading product...</p>
+
+                <button class="btn btn-primary btn-lg w-100" id="addToCartBtn">
+                    Add to Cart
+                </button>
             </div>
         </div>
     </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-        const params = new URLSearchParams(window.location.search);
-        const productId = params.get('id');
-
-        const container = document.getElementById('productDetail');
-
-        if (!productId) {
-            container.innerHTML = `
-                <div class="alert alert-danger text-center">
-                    <h4>Error</h4>
-                    <p>Product ID is missing in the link.</p>
-                    <a href="/" class="btn btn-primary">Back to Catalog</a>
-                </div>
-            `;
-            return;
-        }
-
-        try {
-            const res = await fetch(`/api/products/${productId}`);
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.message || 'Product not found');
-            }
-
-            const product = await res.json();
-
-            const displayName = product.name || 'Product';
-
-            let imagesHtml = '<img src="https://via.placeholder.com/500?text=No+Image" class="product-img img-fluid rounded mb-3" alt="No image">';
-            if (product.images && product.images.length > 0) {
-                imagesHtml = `<img src="${product.images[0]}" class="product-img img-fluid rounded mb-3" alt="${displayName}">`;
-            }
-
-            let variantsHtml = '<option value="">Select Variant (Platform)</option>';
-            if (product.variants && product.variants.length > 0) {
-                product.variants.forEach(v => {
-                    const label = v.platform || v.name || 'Standard';
-                    variantsHtml += `<option value="${label}">${label} (Stock: ${v.stock || 'N/A'})</option>`;
-                });
-            }
-
-            const discountHtml = product.discount 
-                ? `<span class="text-decoration-line-through text-muted me-2">${product.originalPrice.toLocaleString('en-US')} KZT</span>
-                   <span class="badge bg-danger">-${product.discount}%</span>`
-                : '';
-
-            container.innerHTML = `
-                <div class="row">
-                    <div class="col-md-6 text-center">
-                        ${imagesHtml}
-                    </div>
-                    <div class="col-md-6">
-                        <h1 class="fw-bold">${displayName}</h1>
-                        <h5 class="text-muted mb-3">${product.brand || 'Unknown Brand'} • ${product.genre || ''}</h5>
-                        
-                        <h3 class="text-primary mb-4">
-                            ${product.price.toLocaleString('en-US')} KZT
-                            ${discountHtml}
-                        </h3>
-
-                        <p class="lead">${product.description || 'No description available'}</p>
-
-                        <hr>
-
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Select Variant (Platform)</label>
-                            <select class="form-select" id="variantSelect">
-                                ${variantsHtml}
-                            </select>
-                        </div>
-
-                        <!-- Блок Quantity полностью удалён -->
-
-                        <button class="btn btn-primary btn-lg w-100" id="addToCartBtn">
-                            Add to Cart
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('addToCartBtn')?.addEventListener('click', () => {
-                alert('Added to cart! (Feature in development)');
-            });
-
-        } catch (err) {
-            console.error('Error loading product:', err);
-            container.innerHTML = `
-                <div class="alert alert-danger text-center py-5">
-                    <h3>Product Not Found</h3>
-                    <p>${err.message}</p>
-                    <p><small>ID: ${productId}</small></p>
-                    <a href="/" class="btn btn-primary mt-3">Back to Catalog</a>
-                </div>
-            `;
-        }
-    });
-    </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/product.js"></script>
 </body>
 </html>

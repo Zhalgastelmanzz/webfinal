@@ -5,86 +5,122 @@ Features a product catalog, shopping cart, user authentication, admin panel, and
 
 ## Key Features
 
-- Product catalog with category filtering (Action/Adventure, RPG, Horror, Racing, Shooter)
-- Detailed product pages with images, description, platform variants, and discounts
-- Shopping cart persisted in the database
-- User registration and login (JWT-based)
-- Admin dashboard with sales statistics and order management
-- Order creation → record saved in database → automatic redirect to WhatsApp chat
-- Fully responsive design using Bootstrap 5 and vanilla JavaScript
+- **Product catalog** with category filtering (Action/Adventure, RPG, Horror, Racing, Shooter)
+- **Detailed product pages** with images, descriptions, platform variants, and discounts
+- **Shopping cart** persisted in the database
+- **User registration and login** (JWT-based)
+- **Admin dashboard** with sales statistics and order management
+- **Order creation →** record saved in the database → automatic redirect to WhatsApp chat for confirmation and payment
+- Fully **responsive design** using Bootstrap 5 and vanilla JavaScript
 
 ## Technologies
 
-**Backend**
+### Backend
 - Node.js + Express.js
 - MongoDB (Atlas) + Mongoose
 - JWT authentication
 - Role-based access control (user / admin)
 
-**Frontend**
+### Frontend
 - Vanilla JavaScript
 - Bootstrap 5
 - HTML + CSS
 
-**Utilities**
-- dotenv – environment variables
-- bcryptjs – password hashing
-- jsonwebtoken – JWT tokens
+### Utilities
+- **dotenv** – for environment variables
+- **bcryptjs** – password hashing
+- **jsonwebtoken** – JWT tokens
 
+## Installation
 
-1. **Clone the repository**
+1. **Clone the repository:**
 
    ```bash
    git clone https://github.com/Zhalgastelmanzz/webfinal.git
    cd webfinal
+Install dependencies:
 
-Install dependenciesBashnpm install
-Create .env file in the project root and fill it:envPORT=5000
+npm install
+Create a .env file in the project root and fill it with the following:
+
+PORT=5000
 MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/crown_gamestore?retryWrites=true&w=majority
 JWT_SECRET=your_very_long_and_secure_secret_key_at_least_32_chars
-Start the serverBashnpm run dev    # with nodemon (auto-restart on changes)
-# or
-npm start      # normal startServer runs at http://localhost:5000
-Open in browser
+Start the server:
+
+For development (with nodemon, auto-restart on changes):
+
+npm run dev
+Or, for a normal start:
+
+npm start
+The server will run at http://localhost:5000.
+
+Open in your browser:
+
 Home: http://localhost:5000/
-Product detail: http://localhost:5000/product.html?id=...
+
+Product details: http://localhost:5000/product.html?id=...
+
 Cart: http://localhost:5000/cart.html (login required)
 
-
 Authentication
-
 Register: POST /api/auth/register
+
 Login: POST /api/auth/login → saves token to localStorage
+
 Protected routes require Authorization: Bearer <token>
 
-Admin panel is available only for users with admin role.
-Order Placement (Place Order)
+The Admin Panel is available only for users with an admin role.
 
-Add items to cart from product pages
-Go to /cart.html
-Click Place Order
-Order is created in orders collection
-Cart is automatically cleared
-Browser redirects to WhatsApp chat with message:textMy order ID: 123abc456def. Please confirm.(WhatsApp number is set in cart.js – replace with your support number)
+Order Placement
+Add items to the cart from product pages.
+
+Go to /cart.html.
+
+Click Place Order.
+
+The order is created in the orders collection.
+
+The cart is automatically cleared.
+
+Browser redirects to WhatsApp chat with the message:
+
+My order ID: 123abc456def. Please confirm.
+(The WhatsApp number is set in cart.js — replace it with your support number.)
 
 Admin Panel (In Progress)
+Sales statistics by category (using MongoDB Aggregation)
 
-Sales statistics by category (MongoDB Aggregation)
 View and update order statuses
+
 Product and category management
 
 Useful Commands
-Bashnpm run dev     # Start with nodemon (recommended)
-npm start       # Normal start
-Important Notes
+Start with nodemon (recommended):
 
-All products are digital games → stock check and shipping address are disabled
-Payment and key delivery happen via WhatsApp chat
-Use test accounts (admin / user) for development
+npm run dev
+Normal start:
+
+npm start
+Important Notes
+All products are digital games, so stock check and shipping address are disabled.
+
+Payment and key delivery happen via WhatsApp chat.
+
+Use test accounts (admin / user) for development.
 
 Contact & Support
-Want to add features like Kaspi payment, user profile, reviews, product search?
-Feel free to open an issue or contact via WhatsApp.
-Ready to help with improvements! 🚀
-Author: Zhalgas Telman,Samandar Babakhanov,Adil Yerlik
-Date: February 2026
+Want to add features like Kaspi payment, user profile, reviews, or product search?
+Feel free to open an issue or contact via WhatsApp. Ready to help with improvements! 🚀
+
+Authors:
+Zhalgas Telman
+
+Samandar Babakhanov
+
+Adil Yerlik
+
+Date:
+February 2026
+

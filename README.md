@@ -1,140 +1,116 @@
-🛍️ Crown Game Store — Онлайн-магазин игр
+# Crown Game Store - Online Digital Games Shop
 
-Полноценный full-stack интернет-магазин цифровых игр на Node.js, Express и MongoDB.  
-Проект включает каталог продуктов, корзину, авторизацию, админ-панель и оформление заказа с перенаправлением в WhatsApp для подтверждения и оплаты.
+A full-stack e-commerce platform for selling digital games, built with Node.js, Express, and MongoDB.  
+Features a product catalog, shopping cart, user authentication, admin panel, and order placement with WhatsApp redirect for confirmation and payment.
 
----
+## Key Features
 
-## 🏗️ Основные возможности
+- Product catalog with category filtering (Action/Adventure, RPG, Horror, Racing, Shooter)
+- Detailed product pages with images, description, platform variants, and discounts
+- Shopping cart persisted in the database
+- User registration and login (JWT-based)
+- Admin dashboard with sales statistics and order management
+- Order creation → record saved in database → automatic redirect to WhatsApp chat
+- Fully responsive design using Bootstrap 5 and vanilla JavaScript
 
-- Каталог игр с фильтрацией по категориям (Action/Adventure, RPG, Horror, Racing, Shooter)
-- Детальная страница товара с изображениями, описанием, вариантами платформ и скидками
-- Корзина с сохранением в базу данных
-- Авторизация и регистрация пользователей (JWT)
-- Админ-панель со статистикой продаж и управлением заказами
-- Оформление заказа → автоматическое создание ордера в базе → перенаправление в WhatsApp чат поддержки
-- Полностью адаптивный дизайн на Bootstrap 5 + Vanilla JS
-
----
-
-## 📊 Технологии
+## Technologies
 
 **Backend**
 - Node.js + Express.js
 - MongoDB (Atlas) + Mongoose
-- JWT для аутентификации
-- RBAC (роли: user / admin)
+- JWT authentication
+- Role-based access control (user / admin)
 
 **Frontend**
 - Vanilla JavaScript
 - Bootstrap 5
 - HTML + CSS
 
-**Инструменты**
-- dotenv — переменные окружения
-- bcryptjs — хэширование паролей
-- jsonwebtoken — JWT токены
+**Utilities**
+- dotenv – environment variables
+- bcryptjs – password hashing
+- jsonwebtoken – JWT tokens
 
----
-
-## 📂 Структура проекта
+## Project Structure
 webfinal/
-├── public/                  # Статические файлы (HTML, CSS, JS)
+├── public/                     # Static files (HTML, CSS, JS)
 │   ├── js/
-│   │   ├── main.js        # Главная страница, каталог, категории
-│   │   ├── product.js     # Детальная страница товара + добавление в корзину
-│   │   └── cart.js        # Страница корзины + Place Order → WhatsApp
+│   │   ├── main.js           # Home page, catalog, categories
+│   │   ├── product.js        # Product detail page + add to cart
+│   │   └── cart.js           # Cart page + Place Order → WhatsApp
 │   ├── product.html
 │   ├── cart.html
-│   └── ... (остальные страницы)
+│   └── ... (other pages)
 ├── src/
-│   ├── models/            # Mongoose схемы
+│   ├── models/               # Mongoose schemas
 │   │   ├── User.js
 │   │   ├── Product.js
 │   │   ├── Cart.js
 │   │   ├── Order.js
 │   │   └── Category.js
-│   ├── controllers/       # Логика обработки запросов
-│   ├── routes/            # Роуты API
+│   ├── controllers/          # Request handlers logic
+│   ├── routes/               # API routes
 │   ├── middleware/
 │   │   └── auth.middleware.js
-│   └── server.js          # Точка входа сервера
+│   └── server.js             # Server entry point
 ├── .env.example
 ├── package.json
 └── README.md
-text---
+text## Quick Start
 
-## 🚀 Быстрый старт
+1. **Clone the repository**
 
-1. **Клонируй репозиторий**
+   ```bash
+   git clone https://github.com/Zhalgastelmanzz/webfinal.git
+   cd webfinal
 
-```bash
-git clone https://github.com/Zhalgastelmanzz/webfinal.git
-cd webfinal
-
-Установи зависимости
-
-Bashnpm install
-
-Создай файл .env в корне проекта и заполни:
-
-envPORT=5000
-MONGO_URI=mongodb+srv://<user>:<password>@cluster0.mongodb.net/crown_gamestore?retryWrites=true&w=majority
-JWT_SECRET=твой_очень_секретный_ключ_минимум_32_символа
-
-Запусти сервер
-
-Bashnpm run dev    # или npm start
-Сервер запустится на http://localhost:5000
-
-Открой сайт
+Install dependenciesBashnpm install
+Create .env file in the project root and fill it:envPORT=5000
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/crown_gamestore?retryWrites=true&w=majority
+JWT_SECRET=your_very_long_and_secure_secret_key_at_least_32_chars
+Start the serverBashnpm run dev    # with nodemon (auto-restart on changes)
+# or
+npm start      # normal startServer runs at http://localhost:5000
+Open in browser
+Home: http://localhost:5000/
+Product detail: http://localhost:5000/product.html?id=...
+Cart: http://localhost:5000/cart.html (login required)
 
 
-Главная: http://localhost:5000/
-Деталка товара: http://localhost:5000/product.html?id=...
-Корзина: http://localhost:5000/cart.html (нужно залогиниться)
+Authentication
 
+Register: POST /api/auth/register
+Login: POST /api/auth/login → saves token to localStorage
+Protected routes require Authorization: Bearer <token>
 
-🔐 Авторизация
+Admin panel is available only for users with admin role.
+Order Placement (Place Order)
 
-Регистрация: POST /api/auth/register
-Логин: POST /api/auth/login → сохраняет токен в localStorage
-Защищённые роуты используют Bearer Token в заголовке Authorization
+Add items to cart from product pages
+Go to /cart.html
+Click Place Order
+Order is created in orders collection
+Cart is automatically cleared
+Browser redirects to WhatsApp chat with message:textMy order ID: 123abc456def. Please confirm.(WhatsApp number is set in cart.js – replace with your support number)
 
-Админ-панель доступна только для пользователей с ролью admin.
+Admin Panel (In Progress)
 
-🛒 Оформление заказа (Place Order)
+Sales statistics by category (MongoDB Aggregation)
+View and update order statuses
+Product and category management
 
-Добавь товары в корзину (на детальной странице)
-Перейди на /cart.html
-Кликни Place Order
-Создаётся запись в коллекции orders
-Корзина автоматически очищается
-Браузер перенаправляет в WhatsApp чат поддержки с текстом:
+Useful Commands
+Bashnpm run dev     # Start with nodemon (recommended)
+npm start       # Normal start
+Important Notes
 
-textМой заказ ID: 123abc456def. Подтвердите, пожалуйста.
-(номер WhatsApp указан в cart.js — замени на свой)
+All products are digital games → stock check and shipping address are disabled
+Payment and key delivery happen via WhatsApp chat
+Use test accounts (admin / user) for development
 
-⚡ Админ-панель (в разработке)
-
-Статистика продаж по категориям (MongoDB Aggregation)
-Просмотр и изменение статусов заказов
-Управление товарами и категориями
-
-
-🛠️ Полезные команды
-Bashnpm run dev     # запуск с nodemon (автоперезапуск при изменениях)
-npm start       # обычный запуск
-
-⚠️ Важно
-
-Все игры — цифровые, поэтому проверка стока и адрес доставки отключены
-Оплата и отправка ключей происходит через чат в WhatsApp
-Для теста используй тестовые аккаунты (admin / user)
-
-
-📞 Контакты и поддержка
-Если хочешь добавить новые функции (оплата через Kaspi, страница профиля, отзывы, поиск по товарам) — пиши в WhatsApp или создавай issue в репозитории.
-Готов помочь с доработкой! 🚀
-Авторы: Zhalgas Telman,Samandar Babakhanov,Adil Yerlik
-Дата: 2026
+Contact & Support
+Want to add features like Kaspi payment, user profile, reviews, product search?
+Feel free to open an issue or contact via WhatsApp.
+Ready to help with improvements! 🚀
+Author: Zhalgas Telman,Samandar Babakhanov,Adil Yerlik
+Date: February 2026

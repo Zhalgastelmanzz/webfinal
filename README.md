@@ -31,32 +31,6 @@ Features a product catalog, shopping cart, user authentication, admin panel, and
 - bcryptjs – password hashing
 - jsonwebtoken – JWT tokens
 
-## Project Structure
-webfinal/
-├── public/                     # Static files (HTML, CSS, JS)
-│   ├── js/
-│   │   ├── main.js           # Home page, catalog, categories
-│   │   ├── product.js        # Product detail page + add to cart
-│   │   └── cart.js           # Cart page + Place Order → WhatsApp
-│   ├── product.html
-│   ├── cart.html
-│   └── ... (other pages)
-├── src/
-│   ├── models/               # Mongoose schemas
-│   │   ├── User.js
-│   │   ├── Product.js
-│   │   ├── Cart.js
-│   │   ├── Order.js
-│   │   └── Category.js
-│   ├── controllers/          # Request handlers logic
-│   ├── routes/               # API routes
-│   ├── middleware/
-│   │   └── auth.middleware.js
-│   └── server.js             # Server entry point
-├── .env.example
-├── package.json
-└── README.md
-text## Quick Start
 
 1. **Clone the repository**
 

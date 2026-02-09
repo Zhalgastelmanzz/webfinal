@@ -22,11 +22,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         product.platforms.forEach(platform => {
             const option = document.createElement('option');
             option.value = platform;
-            option.textContent = platform; 
+            option.textContent = platform; // Добавляем платформы в выпадающий список
+            variantSelect.appendChild(option);
         });
 
-        
-        document.getElementById('addToCartBtn').onclick = () => addToCart(product._id, 1); 
+        // Убираем поле для ввода количества и всегда ставим qty = 1
+        document.getElementById('addToCartBtn').onclick = () => addToCart(product._id, 1); // Ставим количество 1 по умолчанию
+
     } catch (err) {
         console.error('Error fetching product:', err);
     }
@@ -44,7 +46,7 @@ async function addToCart(productId, qty) {
 
     const sku = document.getElementById('variantSelect').value;
     const priceText = document.getElementById('productPrice').innerText;
-    const priceSnapshot = parseFloat(priceText.replace(/[^0-9.]/g, ''));
+    const priceSnapshot = parseFloat(priceText.replace(/[^0-9.]/g, '')); // Извлекаем цену без валюты
 
     try {
         const res = await fetch('/api/cart/add', {
@@ -53,7 +55,7 @@ async function addToCart(productId, qty) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ productId, sku, qty, priceSnapshot }) 
+            body: JSON.stringify({ productId, sku, qty, priceSnapshot }) // Передаем количество 1
         });
 
         if (res.status === 401) {

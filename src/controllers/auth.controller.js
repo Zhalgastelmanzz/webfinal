@@ -15,28 +15,68 @@ exports.getMe = async (req, res) => {
 };
 
 exports.register = async (req, res) => {
-    try {
-        const { fullName, email, password, phone, defaultAddress } = req.body;
+  try {
+   
+    console.log('Полученные данные для регистрации:', req.body);
 
-        let user = await User.findOne({ email });
-        if (user) return res.status(400).json({ message: "User already exists" });
+    const { fullName, email, password, phone, defaultAddress } = req.body;
 
-        const salt = await bcrypt.genSalt(10);
-        const passwordHash = await bcrypt.hash(password, salt);
-
-        user = new User({
-            fullName,
-            email,
-            passwordHash,
-            phone,
-            defaultAddress
-        });
-
-        await user.save();
-        res.status(201).json({ message: "User registered successfully" });
-    } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+   
+    if (!fullName || fullName.trim() === '') {
+      return res.status(400).json({ message: 'Full Name обязательно' });
     }
+
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email и Password обязательны' });
+    }
+
+    
+    let user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({ message: 'Пользователь с таким email уже существует' });
+    }
+
+  
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
+
+   
+    user = new User({
+      fullName: fullName.trim(),
+      email: email.trim(),
+      passwordHash,
+      phone: phone ? phone.trim() : undefined,
+      defaultAddress: defaultAddress || undefined
+    });
+
+  
+    await user.save();
+
+    console.log(`Пользователь успешно создан: ${user.email}`);
+
+    res.status(201).json({ 
+      message: 'Регистрация успешна! Теперь войдите в аккаунт',
+      userId: user._id 
+    });
+
+  } catch (error) {
+   
+    console.error('Ошибка при регистрации:', error.message);
+    console.error(error.stack); 
+
+    
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ 
+        message: 'Ошибка валидации данных', 
+        details: error.message 
+      });
+    }
+
+    res.status(500).json({ 
+      message: 'Внутренняя ошибка сервера', 
+      error: error.message 
+    });
+  }
 };
 
 exports.login = async (req, res) => {

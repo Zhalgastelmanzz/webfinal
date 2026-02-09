@@ -11,33 +11,46 @@ exports.getCart = async (req, res) => {
 };
 
 exports.addToCart = async (req, res) => {
-    try {
-        const { productId, sku, qty, priceSnapshot } = req.body;
-        const userId = req.user.id; 
+  try {
+    console.log('addToCart вызван. Данные от фронта:', req.body);
+    console.log('Пользователь из токена:', req.user);
 
-        let cart = await Cart.findOne({ userId });
-
-        if (!cart) {
-            cart = new Cart({ userId, items: [] });
-        }
-
-        const itemIndex = cart.items.findIndex(item => 
-            item.productId.toString() === productId && item.sku === sku
-        );
-
-        if (itemIndex > -1) {
-            cart.items[itemIndex].qty += Number(qty);
-        } else {
-            cart.items.push({ productId, sku, qty: Number(qty), priceSnapshot });
-        }
-
-        await cart.save();
-        res.status(200).json(cart);
-    } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: 'Не авторизован. Войдите в аккаунт.' });
     }
-};
 
+    const userId = req.user.id;  
+    const { productId, sku, qty, priceSnapshot } = req.body;
+
+    if (!productId || !sku || !qty || !priceSnapshot) {
+      return res.status(400).json({ message: 'Все поля обязательны' });
+    }
+
+    let cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+      cart = new Cart({ userId, items: [] });
+    }
+
+    const existingItem = cart.items.find(item => item.sku === sku && item.productId.toString() === productId);
+
+    if (existingItem) {
+      existingItem.qty += qty;
+    } else {
+      cart.items.push({ productId, sku, qty, priceSnapshot });
+    }
+
+    await cart.save();
+
+    console.log('Корзина сохранена:', cart);
+
+    res.status(200).json({ message: 'Товар добавлен в корзину', cart });
+  } catch (error) {
+    console.error('Ошибка в addToCart:', error.message);
+    console.error(error.stack);
+    res.status(500).json({ message: 'Ошибка сервера при добавлении в корзину', error: error.message });
+  }
+};
 exports.removeFromCart = async (req, res) => {
     try {
         const cart = await Cart.findOneAndUpdate(

@@ -3,3 +3,7 @@
     font-weight: 450;
     font-style: italic;
 }
+.fw-bolder {
+    font-weight: 700;
+    font-style: normal;
+}
